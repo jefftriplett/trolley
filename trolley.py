@@ -169,6 +169,8 @@ def create_github_labels(config, github_org, github_repo,
             if not len(color):
                 color = get_random_color()
             repository.create_label(name, color)
+        else:
+            click.echo('label "{}" already exists'.format(name))
 
 
 def create_github_milestones(config, github_org, github_repo,
@@ -205,7 +207,6 @@ def delete_existing_github_milestones(config, github_org, github_repo):
     milestones = repository.iter_milestones(github_org, github_repo)
 
     click.echo('removing {} milestones'.format(len(list(milestones))))
-
     for milestone in milestones:
         click.echo('removing milestone "{}"'.format(milestone.title))
         milestone.delete()
