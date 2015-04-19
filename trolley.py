@@ -242,7 +242,8 @@ def get_existing_trello_cards(config, trello_board_id):
 
 def get_existing_trello_labels(config, trello_board_id):
     trello = get_trello_auth(config.trello)
-    labels = []
+    board = trello.boards.get(trello_board_id)
+    labels = [label for label in board['labelNames']]
     return labels
 
 
@@ -275,6 +276,28 @@ def get_trello_list_lookup(config, trello_board_id):
 
 
 # trello core
+
+def create_trello_labels(config, trello_board_id,
+                         filename='etc/default_trello_labels.csv'):
+    with open(filename) as f:
+        labels = list(csv.DictReader(f))
+
+    #trello = get_trello_auth(config.trello)
+    existing_labels = get_existing_trello_labels(config, trello_board_id)
+
+    click.echo('creating {} labels'.format(len(labels)))
+    for label in labels:
+        name = str(label['name'])
+        color = str(label['color'])
+        if name not in existing_labels:
+            click.echo('creating label "{}"'.format(name))
+            if not len(color):
+                color = get_random_color()
+            # TODO: Create Trello label via API
+            #repository.create_label(name, color)
+        else:
+            click.echo('label "{}" already exists'.format(name))
+
 
 def create_trello_lists(config, trello_board_id,
                         filename='etc/default_trello_lists.csv'):
@@ -421,6 +444,14 @@ def cli_create_github_milestones(filename, github_org, github_repo):
         github_org or config.github.org,
         github_repo or config.github.repo,
         filename)
+
+
+@cli.command('create_trello_labels')
+@click.option('--trello-board', type=str)
+def cli_create_trello_labels(trello_board):
+    create_trello_labels(
+        config,
+        trello_board or config.trello.board_id)
 
 
 @cli.command('create_trello_lists')
