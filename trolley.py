@@ -322,114 +322,134 @@ def cli():
 
 
 @cli.command('bootstrap')
-def cli_bootstrap():
+@click.option('--github-org', type=str)
+@click.option('--github-repo', type=str)
+def cli_bootstrap(github_org, github_repo):
     """Sets up github with some sensible defaults."""
     delete_existing_github_labels(
         config,
-        config.github.org,
-        config.github.repo)
+        github_org or config.github.org,
+        github_repo or config.github.repo)
 
     create_github_labels(
         config,
-        config.github.org,
-        config.github.repo)
+        github_org or config.github.org,
+        github_repo or config.github.repo)
 
     create_github_issues(
         config,
-        config.github.org,
-        config.github.repo)
+        github_org or config.github.org,
+        github_repo or config.github.repo)
 
     create_github_milestones(
         config,
-        config.github.org,
-        config.github.repo)
+        github_org or config.github.org,
+        github_repo or config.github.repo)
 
 
 @cli.command('close_existing_github_issues')
 @click.option('--force/--no-force', default=False)
-def cli_close_existing_github_issues(force):
+@click.option('--github-org', type=str)
+@click.option('--github-repo', type=str)
+def cli_close_existing_github_issues(force, github_org, github_repo):
     message = 'Do you really want to close all of your existing GitHub issues?'
     if force or click.confirm(message):
         close_existing_github_issues(
             config,
-            config.github.org,
-            config.github.repo)
+            github_org or config.github.org,
+            github_repo or config.github.repo)
     else:
         click.echo('Action aborted')
 
 
 @cli.command('create_github_issues')
 @click.option('--filename', default='etc/default_issues.csv')
-def cli_create_github_issues(filename):
+@click.option('--github-org', type=str)
+@click.option('--github-repo', type=str)
+def cli_create_github_issues(filename, github_org, github_repo):
     create_github_issues(
         config,
-        config.github.org,
-        config.github.repo,
+        github_org or config.github.org,
+        github_repo or config.github.repo,
         filename)
 
 
 @cli.command('create_github_labels')
 @click.option('--filename', default='etc/default_labels.csv')
-def cli_create_github_labels(filename):
+@click.option('--github-org', type=str)
+@click.option('--github-repo', type=str)
+def cli_create_github_labels(filename, github_org, github_repo):
     create_github_labels(
         config,
-        config.github.org,
-        config.github.repo,
+        github_org or config.github.org,
+        github_repo or config.github.repo,
         filename)
 
 
 @cli.command('create_github_milestones')
 @click.option('--filename', default='etc/default_milestones.csv')
-def cli_create_github_milestones(filename):
+@click.option('--github-org', type=str)
+@click.option('--github-repo', type=str)
+def cli_create_github_milestones(filename, github_org, github_repo):
     create_github_milestones(
         config,
-        config.github.org,
-        config.github.repo,
+        github_org or config.github.org,
+        github_repo or config.github.repo,
         filename)
 
 
 @cli.command('delete_existing_github_labels')
 @click.option('--force/--no-force', default=False)
-def cli_delete_existing_github_labels(force):
+@click.option('--github-org', type=str)
+@click.option('--github-repo', type=str)
+def cli_delete_existing_github_labels(force, github_org, github_repo):
     message = 'Do you really want to delete all of the existing GitHub labels?'
     if force or click.confirm(message):
         delete_existing_github_labels(
             config,
-            config.github.org,
-            config.github.repo)
+            github_org or config.github.org,
+            github_repo or config.github.repo)
     else:
         click.echo('Action aborted')
 
 
 @cli.command('delete_existing_github_milestones')
 @click.option('--force/--no-force', default=False)
-def cli_delete_existing_github_milestones(force):
+@click.option('--github-org', type=str)
+@click.option('--github-repo', type=str)
+def cli_delete_existing_github_milestones(force, github_org, github_repo):
     message = 'Do you really want to delete all of the existing GitHub milestones?'
     if force or click.confirm(message):
         delete_existing_github_milestones(
             config,
-            config.github.org,
-            config.github.repo)
+            github_org or config.github.org,
+            github_repo or config.github.repo)
     else:
         click.echo('Action aborted')
 
 
 @cli.command('sync_github_to_trello_issues')
-def cli_sync_github_to_trello_issues():
+@click.option('--github-org', type=str)
+@click.option('--github-repo', type=str)
+@click.option('--trello-board', type=str)
+def cli_sync_github_to_trello_issues(github_org, github_repo, trello_board):
     sync_github_to_trello_issues(
         config,
-        config.github.org,
-        config.github.repo,
-        config.trello.board_id)
+        github_org or config.github.org,
+        github_repo or config.github.repo,
+        trello_board or config.trello.board_id)
 
 
 @cli.command('sync_trello_to_github_issues')
-def cli_sync_trello_to_github_issues():
+@click.option('--trello-board', type=str)
+@click.option('--github-org', type=str)
+@click.option('--github-repo', type=str)
+def cli_sync_trello_to_github_issues(trello_board, github_org, github_repo):
     sync_trello_to_github_issues(
         config,
-        config.trello.board_id,
-        config.github.org,
-        config.github.repo)
+        trello_board or config.trello.board_id,
+        github_org or config.github.org,
+        github_repo or config.github.repo)
 
 
 if __name__ == '__main__':
