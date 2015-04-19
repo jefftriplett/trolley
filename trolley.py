@@ -312,7 +312,7 @@ def create_trello_lists(config, trello_board_id,
         title = str(list_item['title'])
         if title not in existing_lists:
             click.echo('creating list "{}"'.format(title))
-            new_list = trello.boards.new_list(trello_board_id, title)
+            trello.boards.new_list(trello_board_id, title)
         else:
             click.echo('list "{}" already exists'.format(title))
 
