@@ -29,6 +29,8 @@ TRELLO_BOARD_ID = os.environ.get('TRELLO_BOARD_ID')
 TRELLO_DEFAULT_LIST = os.environ.get('TRELLO_DEFAULT_LIST', 'Uncategorized')
 
 
+# might migrate to:
+#   http://click.pocoo.org/4/options/#values-from-environment-variables
 class config(object):
 
     class github(object):
