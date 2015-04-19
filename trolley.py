@@ -246,6 +246,13 @@ def get_existing_trello_labels(config, trello_board_id):
     return labels
 
 
+def get_existing_trello_lists(config, trello_board_id):
+    trello = get_trello_auth(config.trello)
+    lists = trello.boards.get_list(trello_board_id)
+    lists = [list_item['name'] for list_item in lists]
+    return lists
+
+
 def get_trello_list_lookup(config, trello_board_id):
     trello = get_trello_auth(config.trello)
     boards = trello.boards.get_list(trello_board_id)
@@ -268,6 +275,24 @@ def get_trello_list_lookup(config, trello_board_id):
 
 
 # trello core
+
+def create_trello_lists(config, trello_board_id,
+                        filename='etc/default_trello_lists.csv'):
+    with open(filename) as f:
+        lists = list(csv.DictReader(f))
+
+    trello = get_trello_auth(config.trello)
+    existing_lists = get_existing_trello_lists(config, trello_board_id)
+
+    click.echo('creating {} lists'.format(len(lists)))
+    for list_item in lists:
+        title = str(list_item['title'])
+        if title not in existing_lists:
+            click.echo('creating list "{}"'.format(title))
+            new_list = trello.boards.new_list(trello_board_id, title)
+        else:
+            click.echo('list "{}" already exists'.format(title))
+
 
 def sync_github_to_trello_issues(config, github_org, github_repo,
                                  trello_board_id):
@@ -396,6 +421,14 @@ def cli_create_github_milestones(filename, github_org, github_repo):
         github_org or config.github.org,
         github_repo or config.github.repo,
         filename)
+
+
+@cli.command('create_trello_lists')
+@click.option('--trello-board', type=str)
+def cli_create_trello_lists(trello_board):
+    create_trello_lists(
+        config,
+        trello_board or config.trello.board_id)
 
 
 @cli.command('delete_existing_github_labels')
