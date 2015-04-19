@@ -240,8 +240,10 @@ def get_existing_trello_cards(config, trello_board_id):
     return cards
 
 
-def get_existing_trello_labels():
-    pass
+def get_existing_trello_labels(config, trello_board_id):
+    trello = get_trello_auth(config.trello)
+    labels = []
+    return labels
 
 
 def get_trello_board_lookup(config, trello_board_id):
