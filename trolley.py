@@ -246,7 +246,7 @@ def get_existing_trello_labels(config, trello_board_id):
     return labels
 
 
-def get_trello_board_lookup(config, trello_board_id):
+def get_trello_list_lookup(config, trello_board_id):
     trello = get_trello_auth(config.trello)
     boards = trello.boards.get_list(trello_board_id)
     list_lookup = {}
@@ -272,7 +272,7 @@ def get_trello_board_lookup(config, trello_board_id):
 def sync_github_to_trello_issues(config, github_org, github_repo,
                                  trello_board_id):
     trello = get_trello_auth(config.trello)
-    board_lookup = get_trello_board_lookup(config, trello_board_id)
+    board_lookup = get_trello_list_lookup(config, trello_board_id)
     existing_trello_cards = get_existing_trello_cards(config, trello_board_id)
     repository = get_github_repository(config, github_org, github_repo)
     issues = repository.iter_issues()
