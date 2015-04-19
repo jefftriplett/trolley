@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+"""
+Trolley syncs issues from CSVs to Github and to sync projects between
+Github and Trello.
+"""
+
 import csv
 import os
 import random
@@ -8,8 +14,12 @@ import github3
 
 from trello import TrelloApi
 
-__version__ = (0, 0, 1)
-__author__ = 'Jeff Triplett <jeff.triplett@gmail.com>'
+
+__author__ = 'Jeff Triplett'
+__copyright__ = 'Copyright 2015, Jeff Triplett'
+__license__ = 'BSD'
+__version_info__ = (0, 0, 1)
+__version__ = '.'.join(map(str, __version_info__))
 
 
 # hold auth state
@@ -61,7 +71,7 @@ def get_random_color():
 def print_version(ctx, param, value):
     if not value or ctx.resilient_parsing:
         return
-    click.echo('version {}'.format('.'.join(map(str, __version__))))
+    click.echo('version {}'.format(__version__))
     ctx.exit()
 
 
