@@ -55,46 +55,46 @@ def get_random_color():
 
 # github utils
 
-def get_github_auth(github):
+def get_github_auth(github_config):
     """Log me into github and return an object."""
     global _github_auth
 
     if _github_auth:
         return _github_auth
 
-    _github_auth = github3.login(github.username, github.password)
+    _github_auth = github3.login(github_config.username, github_config.password)
     return _github_auth
 
 
-def get_github_repository(github_config, github_org, github_repo):
+def get_github_repository(config, github_org, github_repo):
     """Return a repository object and log me in."""
-    github = get_github_auth(github_config)
+    github = get_github_auth(config.github)
     repository = github.repository(github_org, github_repo)
     return repository
 
 
-def get_existing_github_issues(github_config, github_org, github_repo):
-    repository = get_github_repository(github_config, github_org, github_repo)
+def get_existing_github_issues(config, github_org, github_repo):
+    repository = get_github_repository(config, github_org, github_repo)
     existing_issues = [str(item.title) for item in repository.iter_issues()]
     return existing_issues
 
 
-def get_existing_github_labels(github_config, github_org, github_repo):
-    repository = get_github_repository(github_config, github_org, github_repo)
+def get_existing_github_labels(config, github_org, github_repo):
+    repository = get_github_repository(config, github_org, github_repo)
     existing_labels = [str(item.name) for item in repository.iter_labels()]
     return existing_labels
 
 
-def get_existing_github_milestones(github_config, github_org, github_repo):
-    repository = get_github_repository(github_config, github_org, github_repo)
+def get_existing_github_milestones(config, github_org, github_repo):
+    repository = get_github_repository(config, github_org, github_repo)
     existing_milestones = [str(item.title) for item in repository.iter_milestones()]
     return existing_milestones
 
 
 # github core
 
-def close_existing_github_issues(github_config, github_org, github_repo):
-    repository = get_github_repository(github_config, github_org, github_repo)
+def close_existing_github_issues(config, github_org, github_repo):
+    repository = get_github_repository(config, github_org, github_repo)
     issues = [str(issue.title) for issue in repository.iter_issues()]
 
     click.echo('closing {} issues'.format(len(issues)))
@@ -103,13 +103,13 @@ def close_existing_github_issues(github_config, github_org, github_repo):
         issue.close()
 
 
-def create_github_issues(github_config, github_org, github_repo,
+def create_github_issues(config, github_org, github_repo,
                          filename='etc/default_issues.csv'):
     with open(filename) as f:
         issues = list(csv.DictReader(f))
 
-    repository = get_github_repository(github_config, github_org, github_repo)
-    existing_issues = get_existing_github_issues(github_config, github_org, github_repo)
+    repository = get_github_repository(config, github_org, github_repo)
+    existing_issues = get_existing_github_issues(config, github_org, github_repo)
 
     click.echo('creating {} issues'.format(len(issues)))
     for issue in issues:
@@ -130,13 +130,13 @@ def create_github_issues(github_config, github_org, github_repo,
             click.echo('issue "{}" already exists'.format(title))
 
 
-def create_github_labels(github_config, github_org, github_repo,
+def create_github_labels(config, github_org, github_repo,
                          filename='etc/default_labels.csv'):
     with open(filename) as f:
         labels = list(csv.DictReader(f))
 
-    repository = get_github_repository(github_config, github_org, github_repo)
-    existing_labels = get_existing_github_labels(github_config, github_org, github_repo)
+    repository = get_github_repository(config, github_org, github_repo)
+    existing_labels = get_existing_github_labels(config, github_org, github_repo)
 
     click.echo('creating {} labels'.format(len(labels)))
     for label in labels:
@@ -149,13 +149,13 @@ def create_github_labels(github_config, github_org, github_repo,
             repository.create_label(name, color)
 
 
-def create_github_milestones(github_config, github_org, github_repo,
+def create_github_milestones(config, github_org, github_repo,
                              filename='etc/default_milestones.csv'):
     with open(filename) as f:
         milestones = list(csv.DictReader(f))
 
-    repository = get_github_repository(github_config, github_org, github_repo)
-    existing_milestones = get_existing_github_milestones(github_config, github_org, github_repo)
+    repository = get_github_repository(config, github_org, github_repo)
+    existing_milestones = get_existing_github_milestones(config, github_org, github_repo)
 
     click.echo('creating {} milestones'.format(len(milestones)))
     for milestone in milestones:
@@ -167,8 +167,8 @@ def create_github_milestones(github_config, github_org, github_repo,
             click.echo('milestone "{}" already exists'.format(title))
 
 
-def delete_existing_github_labels(github_config, github_org, github_repo):
-    repository = get_github_repository(github_config, github_org, github_repo)
+def delete_existing_github_labels(config, github_org, github_repo):
+    repository = get_github_repository(config, github_org, github_repo)
 
     labels = [str(label.name) for label in repository.iter_labels()]
 
@@ -178,8 +178,8 @@ def delete_existing_github_labels(github_config, github_org, github_repo):
         repository.label(label).delete()
 
 
-def delete_existing_github_milestones(github_config, github_org, github_repo):
-    repository = get_github_repository(github_config, github_org, github_repo)
+def delete_existing_github_milestones(config, github_org, github_repo):
+    repository = get_github_repository(config, github_org, github_repo)
     milestones = repository.iter_milestones(github_org, github_repo)
 
     click.echo('removing {} milestones'.format(len(list(milestones))))
@@ -203,15 +203,15 @@ def get_trello_auth(trello_config):
     return _trello_auth
 
 
-def get_existing_trello_boards(trello_config, trello_board_id):
-    trello = get_trello_auth(trello_config)
+def get_existing_trello_boards(config, trello_board_id):
+    trello = get_trello_auth(config.trello)
     boards = trello.boards.get_list(trello_board_id)
     boards = [str(board['name']) for board in boards]
     return boards
 
 
-def get_existing_trello_cards(trello_config, trello_board_id):
-    trello = get_trello_auth(trello_config)
+def get_existing_trello_cards(config, trello_board_id):
+    trello = get_trello_auth(config.trello)
     cards = trello.boards.get_card(trello_board_id)
     cards = [str(card['name']) for card in cards]
     return cards
@@ -221,8 +221,8 @@ def get_existing_trello_labels():
     pass
 
 
-def get_trello_board_lookup(trello_config, trello_board_id):
-    trello = get_trello_auth(trello_config)
+def get_trello_board_lookup(config, trello_board_id):
+    trello = get_trello_auth(config.trello)
     boards = trello.boards.get_list(trello_board_id)
     list_lookup = {}
     for board in boards:
@@ -232,7 +232,7 @@ def get_trello_board_lookup(trello_config, trello_board_id):
         list_lookup[name] = id
         list_lookup[id] = name
 
-    default_list = trello_config.default_list
+    default_list = config.trello.default_list
     if default_list not in list_lookup:
         new_list = trello.boards.new_list(trello_board_id, default_list)
         new_list_id = new_list['id']
@@ -244,19 +244,19 @@ def get_trello_board_lookup(trello_config, trello_board_id):
 
 # trello core
 
-def sync_github_to_trello_issues(github_config, github_org, github_repo,
-                                 trello_config, trello_board_id):
-    trello = get_trello_auth(trello_config)
-    board_lookup = get_trello_board_lookup(trello_config, trello_board_id)
-    existing_trello_cards = get_existing_trello_cards(trello_config, trello_board_id)
-    repository = get_github_repository(github_config, github_org, github_repo)
+def sync_github_to_trello_issues(config, github_org, github_repo,
+                                 trello_board_id):
+    trello = get_trello_auth(config.trello)
+    board_lookup = get_trello_board_lookup(config, trello_board_id)
+    existing_trello_cards = get_existing_trello_cards(config, trello_board_id)
+    repository = get_github_repository(config, github_org, github_repo)
     issues = repository.iter_issues()
 
     #click.echo('creating {} issues'.format(issues.count))
     for issue in issues:
         title = issue.title
         desc = issue.body
-        category = board_lookup[trello_config.default_list]
+        category = board_lookup[config.trello.default_list]
         if title not in existing_trello_cards:
             click.echo('creating issue "{}"'.format(title))
             trello.cards.new(title, category, desc=desc)
@@ -264,12 +264,11 @@ def sync_github_to_trello_issues(github_config, github_org, github_repo,
             click.echo('issue "{}" already exists'.format(title))
 
 
-def sync_trello_to_github_issues(trello_config, trello_board_id, github_config,
-                                 github_org, github_repo):
-    trello = get_trello_auth(trello_config)
-    existing_github_issues = get_existing_github_issues(github_config, github_org, github_repo)
-    repository = get_github_repository(github_config, github_org, github_repo)
-    cards = trello.boards.get_card(trello_config.board_id)
+def sync_trello_to_github_issues(config, trello_board_id, github_org, github_repo):
+    trello = get_trello_auth(config.trello)
+    existing_github_issues = get_existing_github_issues(config, github_org, github_repo)
+    repository = get_github_repository(config, github_org, github_repo)
+    cards = trello.boards.get_card(config.trello.board_id)
 
     click.echo('creating {} cards'.format(len(cards)))
     for card in cards:
@@ -299,22 +298,22 @@ def cli():
 def cli_bootstrap():
     """Sets up github with some sensible defaults."""
     delete_existing_github_labels(
-        config.github,
+        config,
         config.github.org,
         config.github.repo)
 
     create_github_labels(
-        config.github,
+        config,
         config.github.org,
         config.github.repo)
 
     create_github_issues(
-        config.github,
+        config,
         config.github.org,
         config.github.repo)
 
     create_github_milestones(
-        config.github,
+        config,
         config.github.org,
         config.github.repo)
 
@@ -325,7 +324,7 @@ def cli_close_existing_github_issues(force):
     message = 'Do you really want to close all of your existing GitHub issues?'
     if force or click.confirm(message):
         close_existing_github_issues(
-            config.github,
+            config,
             config.github.org,
             config.github.repo)
     else:
@@ -336,7 +335,7 @@ def cli_close_existing_github_issues(force):
 @click.option('--filename', default='etc/default_issues.csv')
 def cli_create_github_issues(filename):
     create_github_issues(
-        config.github,
+        config,
         config.github.org,
         config.github.repo,
         filename)
@@ -346,7 +345,7 @@ def cli_create_github_issues(filename):
 @click.option('--filename', default='etc/default_labels.csv')
 def cli_create_github_labels(filename):
     create_github_labels(
-        config.github,
+        config,
         config.github.org,
         config.github.repo,
         filename)
@@ -356,7 +355,7 @@ def cli_create_github_labels(filename):
 @click.option('--filename', default='etc/default_milestones.csv')
 def cli_create_github_milestones(filename):
     create_github_milestones(
-        config.github,
+        config,
         config.github.org,
         config.github.repo,
         filename)
@@ -368,7 +367,7 @@ def cli_delete_existing_github_labels(force):
     message = 'Do you really want to delete all of the existing GitHub labels?'
     if force or click.confirm(message):
         delete_existing_github_labels(
-            config.github,
+            config,
             config.github.org,
             config.github.repo)
     else:
@@ -381,7 +380,7 @@ def cli_delete_existing_github_milestones(force):
     message = 'Do you really want to delete all of the existing GitHub milestones?'
     if force or click.confirm(message):
         delete_existing_github_milestones(
-            config.github,
+            config,
             config.github.org,
             config.github.repo)
     else:
@@ -391,19 +390,17 @@ def cli_delete_existing_github_milestones(force):
 @cli.command('sync_github_to_trello_issues')
 def cli_sync_github_to_trello_issues():
     sync_github_to_trello_issues(
-        config.github,
+        config,
         config.github.org,
         config.github.repo,
-        config.trello,
         config.trello.board_id)
 
 
 @cli.command('sync_trello_to_github_issues')
 def cli_sync_trello_to_github_issues():
     sync_trello_to_github_issues(
-        config.trello,
+        config,
         config.trello.board_id,
-        config.github,
         config.github.org,
         config.github.repo)
 
