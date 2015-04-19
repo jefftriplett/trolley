@@ -415,6 +415,7 @@ def cli_close_existing_github_issues(force, github_org, github_repo):
 @click.option('--github-org', type=str)
 @click.option('--github-repo', type=str)
 def cli_create_github_issues(filename, github_org, github_repo):
+    """Create GitHub issues from a CSV file."""
     create_github_issues(
         config,
         github_org or config.github.org,
@@ -427,6 +428,7 @@ def cli_create_github_issues(filename, github_org, github_repo):
 @click.option('--github-org', type=str)
 @click.option('--github-repo', type=str)
 def cli_create_github_labels(filename, github_org, github_repo):
+    """Create GitHub labels from a CSV file."""
     create_github_labels(
         config,
         github_org or config.github.org,
@@ -439,6 +441,7 @@ def cli_create_github_labels(filename, github_org, github_repo):
 @click.option('--github-org', type=str)
 @click.option('--github-repo', type=str)
 def cli_create_github_milestones(filename, github_org, github_repo):
+    """Create GitHub milestones from a CSV file."""
     create_github_milestones(
         config,
         github_org or config.github.org,
@@ -447,19 +450,25 @@ def cli_create_github_milestones(filename, github_org, github_repo):
 
 
 @cli.command('create_trello_labels')
+@click.option('--filename', default='etc/default_trello_labels.csv')
 @click.option('--trello-board', type=str)
-def cli_create_trello_labels(trello_board):
+def cli_create_trello_labels(filename, trello_board):
+    """Create Trello issues from a CSV file."""
     create_trello_labels(
         config,
-        trello_board or config.trello.board_id)
+        trello_board or config.trello.board_id,
+        filename)
 
 
 @cli.command('create_trello_lists')
+@click.option('--filename', default='etc/default_trello_lists.csv')
 @click.option('--trello-board', type=str)
-def cli_create_trello_lists(trello_board):
+def cli_create_trello_lists(filename, trello_board):
+    """Create Trello lists from a CSV file."""
     create_trello_lists(
         config,
-        trello_board or config.trello.board_id)
+        trello_board or config.trello.board_id,
+        filename)
 
 
 @cli.command('delete_existing_github_labels')
