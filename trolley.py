@@ -126,7 +126,7 @@ def close_existing_github_issues(config, github_org, github_repo):
 
 
 def create_github_issues(config, github_org, github_repo,
-                         filename='etc/default_issues.csv'):
+                         filename='etc/default_github_issues.csv'):
     with open(filename) as f:
         issues = list(csv.DictReader(f))
 
@@ -153,7 +153,7 @@ def create_github_issues(config, github_org, github_repo,
 
 
 def create_github_labels(config, github_org, github_repo,
-                         filename='etc/default_labels.csv'):
+                         filename='etc/default_github_labels.csv'):
     with open(filename) as f:
         labels = list(csv.DictReader(f))
 
@@ -174,7 +174,7 @@ def create_github_labels(config, github_org, github_repo,
 
 
 def create_github_milestones(config, github_org, github_repo,
-                             filename='etc/default_milestones.csv'):
+                             filename='etc/default_github_milestones.csv'):
     with open(filename) as f:
         milestones = list(csv.DictReader(f))
 
@@ -363,7 +363,7 @@ def cli_close_existing_github_issues(force, github_org, github_repo):
 
 
 @cli.command('create_github_issues')
-@click.option('--filename', default='etc/default_issues.csv')
+@click.option('--filename', default='etc/default_github_issues.csv')
 @click.option('--github-org', type=str)
 @click.option('--github-repo', type=str)
 def cli_create_github_issues(filename, github_org, github_repo):
@@ -375,7 +375,7 @@ def cli_create_github_issues(filename, github_org, github_repo):
 
 
 @cli.command('create_github_labels')
-@click.option('--filename', default='etc/default_labels.csv')
+@click.option('--filename', default='etc/default_github_labels.csv')
 @click.option('--github-org', type=str)
 @click.option('--github-repo', type=str)
 def cli_create_github_labels(filename, github_org, github_repo):
@@ -387,7 +387,7 @@ def cli_create_github_labels(filename, github_org, github_repo):
 
 
 @cli.command('create_github_milestones')
-@click.option('--filename', default='etc/default_milestones.csv')
+@click.option('--filename', default='etc/default_github_milestones.csv')
 @click.option('--github-org', type=str)
 @click.option('--github-repo', type=str)
 def cli_create_github_milestones(filename, github_org, github_repo):
