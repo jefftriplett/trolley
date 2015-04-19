@@ -1,6 +1,6 @@
 # Trolley
 
-Tools to help sync issues from CSVs to Github and to sync projects between Github and Trello.
+Trolley syncs issues from CSVs to Github and to sync projects between Github and Trello.
 
 Trolley is a useful tool for loading an initial set of issues, labels, and milestones on github.
 
