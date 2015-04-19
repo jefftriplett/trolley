@@ -8,6 +8,9 @@ import github3
 
 from trello import TrelloApi
 
+__version__ = (0, 0, 1)
+__author__ = 'Jeff Triplett <jeff.triplett@gmail.com>'
+
 
 # hold auth state
 _github_auth = None
@@ -51,6 +54,13 @@ def get_random_color():
 
     index = random.randint(0, len(colors))
     return colors[index]['color']
+
+
+def print_version(ctx, param, value):
+    if not value or ctx.resilient_parsing:
+        return
+    click.echo('version {}'.format('.'.join(map(str, __version__))))
+    ctx.exit()
 
 
 # github utils
@@ -290,6 +300,8 @@ def sync_trello_to_github_issues(config, trello_board_id, github_org, github_rep
 
 @click.group()
 @click_config.wrap(module=config, sections=('github', 'trello'))
+@click.option('--version', is_flag=True, callback=print_version,
+              expose_value=False, is_eager=True)
 def cli():
     pass
 
