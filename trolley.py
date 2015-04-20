@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """
-Trolley syncs issues from CSVs to Github and to sync projects between
-Github and Trello.
+Trolley syncs issues between CSV, Github, and Trello.
 """
 
 import csv
