@@ -343,8 +343,8 @@ def sync_trello_cards_to_github_issues(config, trello_board_id, github_org, gith
         name = card['name']
         #id = card['id']
         #list_id = card['idList']
-        description = card['desc']  # boolean...
-        labels = []
+        description = card['desc']
+        labels = card.get('labels', [])
 
         if name not in existing_github_issues:
             click.echo('creating card "{}"'.format(name))
