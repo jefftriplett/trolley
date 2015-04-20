@@ -400,6 +400,7 @@ def cli_bootstrap(github_org, github_repo):
 @click.option('--github-org', type=str)
 @click.option('--github-repo', type=str)
 def cli_close_existing_github_issues(force, github_org, github_repo):
+    """Close all existing GitHub issues."""
     message = 'Do you really want to close all of your existing GitHub issues?'
     if force or click.confirm(message):
         close_existing_github_issues(
