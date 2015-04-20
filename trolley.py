@@ -514,6 +514,7 @@ def cli_create_trello_lists(filename, trello_board):
 @click.option('--github-org', type=str)
 @click.option('--github-repo', type=str)
 def cli_delete_existing_github_labels(force, github_org, github_repo):
+    """Delete labels from GitHub repo."""
     message = 'Do you really want to delete all of the existing GitHub labels?'
     if force or click.confirm(message):
         delete_existing_github_labels(
@@ -529,6 +530,7 @@ def cli_delete_existing_github_labels(force, github_org, github_repo):
 @click.option('--github-org', type=str)
 @click.option('--github-repo', type=str)
 def cli_delete_existing_github_milestones(force, github_org, github_repo):
+    """Delete milestones from GitHub repo."""
     message = 'Do you really want to delete all of the existing GitHub milestones?'
     if force or click.confirm(message):
         delete_existing_github_milestones(
@@ -544,6 +546,7 @@ def cli_delete_existing_github_milestones(force, github_org, github_repo):
 @click.option('--github-repo', type=str)
 @click.option('--trello-board', type=str)
 def cli_sync_github_issues_to_trello_cards(github_org, github_repo, trello_board):
+    """Convert your GitHub issues to Trello cards."""
     sync_github_issues_to_trello_cards(
         config,
         github_org or config.github.org,
@@ -556,6 +559,7 @@ def cli_sync_github_issues_to_trello_cards(github_org, github_repo, trello_board
 @click.option('--github-org', type=str)
 @click.option('--github-repo', type=str)
 def cli_sync_trello_cards_to_github_issues(trello_board, github_org, github_repo):
+    """Convert your Trello cards to GitHub issues."""
     sync_trello_cards_to_github_issues(
         config,
         trello_board or config.trello.board_id,

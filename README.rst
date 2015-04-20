@@ -80,12 +80,16 @@ Commands
     Create Trello lists from a CSV file.
 
 ``delete_existing_github_labels``
+    Delete labels from GitHub repo.
 
 ``delete_existing_github_milestones``
+    Delete milestones from GitHub repo.
 
 ``sync_github_issues_to_trello_cards``
+    Convert your GitHub issues to Trello cards.
 
 ``sync_trello_cards_to_github_issues``
+    Convert your Trello cards to GitHub issues.
 
 Object Overview
 ---------------
