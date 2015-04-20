@@ -285,8 +285,8 @@ def create_trello_cards(config, trello_board_id,
     click.echo('creating {} cards'.format(len(cards)))
     for card in cards:
         title = str(card['title'])
-        body = str(card['body'])
-        labels = card['labels']
+        body = str(card.get('body', ''))
+        labels = card.get('labels', [])
 
         if labels:
             if ',' in labels:
@@ -297,9 +297,14 @@ def create_trello_cards(config, trello_board_id,
         if title not in existing_cards:
             click.echo('creating issue "{}"'.format(title))
             new_card = trello.cards.new(title, category, desc=body)
+            '''
+            # currently labels are broken in the trello python client :/
             if len(labels):
+                import ipdb
+                ipdb.set_trace()
                 for label in labels:
                     trello.cards.new_label(new_card['id'], label)
+            '''
         else:
             click.echo('issue "{}" already exists'.format(title))
 
