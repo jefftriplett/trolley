@@ -276,6 +276,37 @@ def get_trello_list_lookup(config, trello_board_id):
 
 # trello core
 
+def create_trello_cards(config, trello_board_id,
+                        filename='etc/default_trello_cards.csv'):
+    cards = csv_to_dict_list(filename)
+    trello = get_trello_auth(config.trello)
+    existing_cards = get_existing_trello_cards(config, trello_board_id)
+
+    board_lookup = get_trello_list_lookup(config, trello_board_id)
+    category = board_lookup[config.trello.default_list]
+
+    click.echo('creating {} cards'.format(len(cards)))
+    for card in cards:
+        title = str(card['title'])
+        body = str(card['body'])
+        labels = card['labels']
+
+        if labels:
+            if ',' in labels:
+                labels = labels.split(',')
+            else:
+                labels = [labels]
+
+        if title not in existing_cards:
+            click.echo('creating issue "{}"'.format(title))
+            new_card = trello.cards.new(title, category, desc=body)
+            if len(labels):
+                for label in labels:
+                    trello.cards.new_label(new_card['id'], label)
+        else:
+            click.echo('issue "{}" already exists'.format(title))
+
+
 def create_trello_labels(config, trello_board_id,
                          filename='etc/default_trello_labels.csv'):
     labels = csv_to_dict_list(filename)
@@ -444,6 +475,17 @@ def cli_create_github_milestones(filename, github_org, github_repo):
         config,
         github_org or config.github.org,
         github_repo or config.github.repo,
+        filename)
+
+
+@cli.command('create_trello_cards')
+@click.option('--filename', default='etc/default_trello_labels.csv')
+@click.option('--trello-board', type=str)
+def cli_create_trello_cards(filename, trello_board):
+    """Create Trello cards from a CSV file."""
+    create_trello_cards(
+        config,
+        trello_board or config.trello.board_id,
         filename)
 
 
