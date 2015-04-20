@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='Trolley',
-    version='0.1.0',
+    version='0.1.1',
     description='Trolley syncs issues between CSV, Github, and Trello.',
     author='Jeff Triplett',
     author_email='jeff.triplett@gmail.com',
