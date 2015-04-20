@@ -1,1 +1,3 @@
 include etc/*.csv
+include *.md
+include *.txt
