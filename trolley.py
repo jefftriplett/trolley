@@ -300,8 +300,6 @@ def create_trello_cards(config, trello_board_id,
             '''
             # currently labels are broken in the trello python client :/
             if len(labels):
-                import ipdb
-                ipdb.set_trace()
                 for label in labels:
                     trello.cards.new_label(new_card['id'], label)
             '''
