@@ -2,3 +2,7 @@ click
 click-config
 github3.py
 trello
+
+check-manifest
+invoke
+wheel
