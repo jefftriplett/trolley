@@ -3,6 +3,7 @@ click-config
 github3.py
 trello
 
+bumpversion
 check-manifest
 invoke
 wheel
