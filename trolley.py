@@ -258,7 +258,6 @@ def get_trello_list_lookup(config, trello_board_id):
     for board in boards:
         id = board['id']
         name = board['name']
-        click.secho('{} - {}'.format(id, name), fg='blue')
         list_lookup[name] = id
         list_lookup[id] = name
 
