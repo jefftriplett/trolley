@@ -59,11 +59,16 @@ class config(object):
 
 # utils
 
+def csv_to_dict_list(filename):
+    """Open a CSV file and return a list of dict objects."""
+    with open(filename) as f:
+        values = list(csv.DictReader(f))
+    return values
+
+
 def get_random_color():
     filename = 'etc/color-blind-safe.csv'
-    with open(filename) as f:
-        colors = list(csv.DictReader(f))
-
+    colors = csv_to_dict_list(filename)
     index = random.randint(0, len(colors))
     return colors[index]['color']
 
@@ -127,9 +132,7 @@ def close_existing_github_issues(config, github_org, github_repo):
 
 def create_github_issues(config, github_org, github_repo,
                          filename='etc/default_github_issues.csv'):
-    with open(filename) as f:
-        issues = list(csv.DictReader(f))
-
+    issues = csv_to_dict_list(filename)
     repository = get_github_repository(config, github_org, github_repo)
     existing_issues = get_existing_github_issues(config, github_org, github_repo)
 
@@ -154,9 +157,7 @@ def create_github_issues(config, github_org, github_repo,
 
 def create_github_labels(config, github_org, github_repo,
                          filename='etc/default_github_labels.csv'):
-    with open(filename) as f:
-        labels = list(csv.DictReader(f))
-
+    labels = csv_to_dict_list(filename)
     repository = get_github_repository(config, github_org, github_repo)
     existing_labels = get_existing_github_labels(config, github_org, github_repo)
 
@@ -175,9 +176,7 @@ def create_github_labels(config, github_org, github_repo,
 
 def create_github_milestones(config, github_org, github_repo,
                              filename='etc/default_github_milestones.csv'):
-    with open(filename) as f:
-        milestones = list(csv.DictReader(f))
-
+    milestones = csv_to_dict_list(filename)
     repository = get_github_repository(config, github_org, github_repo)
     existing_milestones = get_existing_github_milestones(config, github_org, github_repo)
 
@@ -279,9 +278,7 @@ def get_trello_list_lookup(config, trello_board_id):
 
 def create_trello_labels(config, trello_board_id,
                          filename='etc/default_trello_labels.csv'):
-    with open(filename) as f:
-        labels = list(csv.DictReader(f))
-
+    labels = csv_to_dict_list(filename)
     #trello = get_trello_auth(config.trello)
     existing_labels = get_existing_trello_labels(config, trello_board_id)
 
@@ -301,9 +298,7 @@ def create_trello_labels(config, trello_board_id,
 
 def create_trello_lists(config, trello_board_id,
                         filename='etc/default_trello_lists.csv'):
-    with open(filename) as f:
-        lists = list(csv.DictReader(f))
-
+    lists = csv_to_dict_list(filename)
     trello = get_trello_auth(config.trello)
     existing_lists = get_existing_trello_lists(config, trello_board_id)
 
