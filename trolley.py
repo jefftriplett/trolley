@@ -312,6 +312,8 @@ def create_trello_lists(config, trello_board_id,
             click.echo('list "{}" already exists'.format(title))
 
 
+# sync github and trello
+
 def sync_github_issues_to_trello_cards(config, github_org, github_repo,
                                        trello_board_id):
     trello = get_trello_auth(config.trello)
@@ -449,7 +451,7 @@ def cli_create_github_milestones(filename, github_org, github_repo):
 @click.option('--filename', default='etc/default_trello_labels.csv')
 @click.option('--trello-board', type=str)
 def cli_create_trello_labels(filename, trello_board):
-    """Create Trello issues from a CSV file."""
+    """Create Trello labels from a CSV file."""
     create_trello_labels(
         config,
         trello_board or config.trello.board_id,
