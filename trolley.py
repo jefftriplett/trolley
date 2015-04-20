@@ -317,8 +317,8 @@ def create_trello_lists(config, trello_board_id,
             click.echo('list "{}" already exists'.format(title))
 
 
-def sync_github_to_trello_issues(config, github_org, github_repo,
-                                 trello_board_id):
+def sync_github_issues_to_trello_cards(config, github_org, github_repo,
+                                       trello_board_id):
     trello = get_trello_auth(config.trello)
     board_lookup = get_trello_list_lookup(config, trello_board_id)
     existing_trello_cards = get_existing_trello_cards(config, trello_board_id)
@@ -337,7 +337,7 @@ def sync_github_to_trello_issues(config, github_org, github_repo,
             click.echo('issue "{}" already exists'.format(title))
 
 
-def sync_trello_to_github_issues(config, trello_board_id, github_org, github_repo):
+def sync_trello_cards_to_github_issues(config, trello_board_id, github_org, github_repo):
     trello = get_trello_auth(config.trello)
     existing_github_issues = get_existing_github_issues(config, github_org, github_repo)
     repository = get_github_repository(config, github_org, github_repo)
@@ -501,24 +501,24 @@ def cli_delete_existing_github_milestones(force, github_org, github_repo):
         click.echo('Action aborted')
 
 
-@cli.command('sync_github_to_trello_issues')
+@cli.command('sync_github_issues_to_trello_cards')
 @click.option('--github-org', type=str)
 @click.option('--github-repo', type=str)
 @click.option('--trello-board', type=str)
-def cli_sync_github_to_trello_issues(github_org, github_repo, trello_board):
-    sync_github_to_trello_issues(
+def cli_sync_github_issues_to_trello_cards(github_org, github_repo, trello_board):
+    sync_github_issues_to_trello_cards(
         config,
         github_org or config.github.org,
         github_repo or config.github.repo,
         trello_board or config.trello.board_id)
 
 
-@cli.command('sync_trello_to_github_issues')
+@cli.command('sync_trello_cards_to_github_issues')
 @click.option('--trello-board', type=str)
 @click.option('--github-org', type=str)
 @click.option('--github-repo', type=str)
-def cli_sync_trello_to_github_issues(trello_board, github_org, github_repo):
-    sync_trello_to_github_issues(
+def cli_sync_trello_cards_to_github_issues(trello_board, github_org, github_repo):
+    sync_trello_cards_to_github_issues(
         config,
         trello_board or config.trello.board_id,
         github_org or config.github.org,
