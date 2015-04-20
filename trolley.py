@@ -17,7 +17,7 @@ from trello import TrelloApi
 __author__ = 'Jeff Triplett'
 __copyright__ = 'Copyright 2015, Jeff Triplett'
 __license__ = 'BSD'
-__version__ = '0.1.4'
+__version__ = '0.1.5'
 
 
 # hold auth state
