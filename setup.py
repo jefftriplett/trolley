@@ -18,6 +18,6 @@ setup(
         'click',
         'click-config',
         'github3.py',
-        'trello',
+        'git+https://github.com/sarumont/py-trello',
     ],
 )
