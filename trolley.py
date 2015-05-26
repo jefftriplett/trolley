@@ -87,7 +87,13 @@ def get_github_auth(github_config):
     if _github_auth:
         return _github_auth
 
-    _github_auth = github3.login(github_config.username, github_config.password)
+    assert github_config.username
+    assert github_config.password
+
+    _github_auth = github3.login(
+        github_config.username,
+        github_config.password)
+
     return _github_auth
 
 
@@ -218,10 +224,14 @@ def get_trello_auth(trello_config):
     if _trello_auth:
         return _trello_auth
 
+    assert trello_config.app_key
+    assert trello_config.app_secret
+    assert trello_config.auth_token
+
     _trello_auth = TrelloClient(
-        api_key=str(trello_config.app_key),
-        api_secret=str(trello_config.app_secret),
-        token=str(trello_config.auth_token),
+        api_key=trello_config.app_key,
+        api_secret=trello_config.app_secret,
+        token=trello_config.auth_token,
         # token_secret=str(trello_config.auth_token),
     )
     return _trello_auth
@@ -293,8 +303,6 @@ def create_trello_cards(config, trello_board_id,
     click.echo('creating {} cards'.format(len(cards)))
 
     for card in cards:
-        print card
-
         name = str(card.get('title', ''))
         description = str(card.get('body', ''))
         labels = card.get('labels', [])
@@ -602,8 +610,6 @@ def cli_sync_trello_cards_to_github_issues(trello_board, github_org, github_repo
 @click.option('--trello-board', type=str)
 def cli_list_trello_cards(trello_board):
     """Convert your Trello cards to GitHub issues."""
-
-    print trello_board or config.trello.board_id
 
     list_trello_cards(
         config,
