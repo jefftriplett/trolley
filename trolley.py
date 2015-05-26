@@ -11,7 +11,7 @@ import click
 import click_config
 import github3
 
-from trello import TrelloApi
+from trello import TrelloClient
 
 
 __author__ = 'Jeff Triplett'
@@ -218,53 +218,61 @@ def get_trello_auth(trello_config):
     if _trello_auth:
         return _trello_auth
 
-    _trello_auth = TrelloApi(trello_config.app_key,
-                             token=trello_config.auth_token)
+    _trello_auth = TrelloClient(
+        api_key=str(trello_config.app_key),
+        api_secret=str(trello_config.app_secret),
+        token=str(trello_config.auth_token),
+        # token_secret=str(trello_config.auth_token),
+    )
     return _trello_auth
 
 
 def get_existing_trello_boards(config, trello_board_id):
     trello = get_trello_auth(config.trello)
-    boards = trello.boards.get_list(trello_board_id)
-    boards = [str(board['name']) for board in boards]
+    board = trello.get_board(trello_board_id)
+    boards = [str(board.name) for board in board.get_cards()]
     return boards
 
 
 def get_existing_trello_cards(config, trello_board_id):
     trello = get_trello_auth(config.trello)
-    cards = trello.boards.get_card(trello_board_id)
-    cards = [str(card['name']) for card in cards]
+    board = trello.get_board(trello_board_id)
+    cards = board.get_cards()
+    cards = [str(card.name) for card in cards]
     return cards
 
 
 def get_existing_trello_labels(config, trello_board_id):
     trello = get_trello_auth(config.trello)
-    board = trello.boards.get(trello_board_id)
-    labels = [label for label in board['labelNames']]
+    board = trello.get_board(trello_board_id)
+    labels = board.get_labels()
+    labels = [label for label in labels]
     return labels
 
 
 def get_existing_trello_lists(config, trello_board_id):
     trello = get_trello_auth(config.trello)
-    lists = trello.boards.get_list(trello_board_id)
-    lists = [list_item['name'] for list_item in lists]
-    return lists
+    board = trello.get_board(trello_board_id)
+    all_lists = board.all_lists()
+    all_lists = [item.name for item in all_lists]
+    return all_lists
 
 
 def get_trello_list_lookup(config, trello_board_id):
     trello = get_trello_auth(config.trello)
-    boards = trello.boards.get_list(trello_board_id)
+    board = trello.get_board(trello_board_id)
+    all_lists = board.all_lists()
     list_lookup = {}
-    for board in boards:
-        id = board['id']
-        name = board['name']
+    for item in all_lists:
+        id = item.id
+        name = item.name
         list_lookup[name] = id
         list_lookup[id] = name
 
     default_list = config.trello.default_list
     if default_list not in list_lookup:
-        new_list = trello.boards.new_list(trello_board_id, default_list)
-        new_list_id = new_list['id']
+        new_list = board.add_list(default_list)
+        new_list_id = new_list.id
         list_lookup[default_list] = new_list_id
         list_lookup[new_list_id] = default_list
 
@@ -278,14 +286,17 @@ def create_trello_cards(config, trello_board_id,
     cards = csv_to_dict_list(filename)
     trello = get_trello_auth(config.trello)
     existing_cards = get_existing_trello_cards(config, trello_board_id)
-
     board_lookup = get_trello_list_lookup(config, trello_board_id)
     category = board_lookup[config.trello.default_list]
+    board = trello.get_board(trello_board_id)
 
     click.echo('creating {} cards'.format(len(cards)))
+
     for card in cards:
-        title = str(card['title'])
-        body = str(card.get('body', ''))
+        print card
+
+        name = str(card.get('title', ''))
+        description = str(card.get('body', ''))
         labels = card.get('labels', [])
 
         if labels:
@@ -294,9 +305,11 @@ def create_trello_cards(config, trello_board_id,
             else:
                 labels = [labels]
 
-        if title not in existing_cards:
-            click.echo('creating issue "{}"'.format(title))
-            new_card = trello.cards.new(title, category, desc=body)
+        if name not in existing_cards:
+            click.echo('creating issue "{}"'.format(name))
+            list_item = board.get_list(category)
+            new_card = list_item.add_card(name, description, labels=labels)
+
             '''
             # currently labels are broken in the trello python client :/
             if len(labels):
@@ -304,13 +317,12 @@ def create_trello_cards(config, trello_board_id,
                     trello.cards.new_label(new_card['id'], label)
             '''
         else:
-            click.echo('issue "{}" already exists'.format(title))
+            click.echo('issue "{}" already exists'.format(name))
 
 
 def create_trello_labels(config, trello_board_id,
                          filename='etc/default_trello_labels.csv'):
     labels = csv_to_dict_list(filename)
-    #trello = get_trello_auth(config.trello)
     existing_labels = get_existing_trello_labels(config, trello_board_id)
 
     click.echo('creating {} labels'.format(len(labels)))
@@ -334,8 +346,9 @@ def create_trello_lists(config, trello_board_id,
     existing_lists = get_existing_trello_lists(config, trello_board_id)
 
     click.echo('creating {} lists'.format(len(lists)))
-    for list_item in lists:
-        title = str(list_item['title'])
+
+    for item in lists:
+        title = str(item['title'])
         if title not in existing_lists:
             click.echo('creating list "{}"'.format(title))
             trello.boards.new_list(trello_board_id, title)
@@ -354,6 +367,7 @@ def sync_github_issues_to_trello_cards(config, github_org, github_repo,
     issues = repository.iter_issues()
 
     #click.echo('creating {} issues'.format(issues.count))
+
     for issue in issues:
         title = issue.title
         desc = issue.body
@@ -369,15 +383,16 @@ def sync_trello_cards_to_github_issues(config, trello_board_id, github_org, gith
     trello = get_trello_auth(config.trello)
     existing_github_issues = get_existing_github_issues(config, github_org, github_repo)
     repository = get_github_repository(config, github_org, github_repo)
-    cards = trello.boards.get_card(config.trello.board_id)
+    board = trello.get_board(trello_board_id)
+    cards = board.all_cards()
 
     click.echo('creating {} cards'.format(len(cards)))
     for card in cards:
-        name = card['name']
-        #id = card['id']
-        #list_id = card['idList']
-        description = card['desc']
-        labels = card.get('labels', [])
+        name = card.name
+        # id = card['id']
+        # list_id = card['idList']
+        description = card.description
+        labels = card.labels
 
         if name not in existing_github_issues:
             click.echo('creating card "{}"'.format(name))
@@ -385,6 +400,20 @@ def sync_trello_cards_to_github_issues(config, trello_board_id, github_org, gith
 
         else:
             click.echo('card "{}" already exists'.format(name))
+
+
+def list_trello_cards(config, trello_board_id):
+    trello = get_trello_auth(config.trello)
+    board = trello.get_board(config.trello.board_id)
+    cards = [card for card in board.open_cards()]
+
+    for card in cards:
+        name = card.name
+        card_id = card.id
+        description = card.description
+        click.echo('{0}: {1}'.format(card_id, name))
+        if len(description):
+            click.echo(description)
 
 
 # cli methods we are exposing to be used via terminal
@@ -479,7 +508,7 @@ def cli_create_github_milestones(filename, github_org, github_repo):
 
 
 @cli.command('create_trello_cards')
-@click.option('--filename', default='etc/default_trello_labels.csv')
+@click.option('--filename', default='etc/default_trello_cards.csv')
 @click.option('--trello-board', type=str)
 def cli_create_trello_cards(filename, trello_board):
     """Create Trello cards from a CSV file."""
@@ -567,6 +596,18 @@ def cli_sync_trello_cards_to_github_issues(trello_board, github_org, github_repo
         trello_board or config.trello.board_id,
         github_org or config.github.org,
         github_repo or config.github.repo)
+
+
+@cli.command('list_trello_cards')
+@click.option('--trello-board', type=str)
+def cli_list_trello_cards(trello_board):
+    """Convert your Trello cards to GitHub issues."""
+
+    print trello_board or config.trello.board_id
+
+    list_trello_cards(
+        config,
+        trello_board or config.trello.board_id)
 
 
 if __name__ == '__main__':
