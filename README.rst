@@ -30,6 +30,11 @@ Example trolley.yml
 
 .. code-block:: yaml
 
+    buffer:
+        client_id: 'buffer client_id'
+        client_secret: 'buffer client_secret'
+        access_token: 'buffer access_token'
+
     github:
         username: 'username'
         password: 'password'
