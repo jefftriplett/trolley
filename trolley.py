@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 """
-Trolley syncs issues between CSV, Github, and Trello.
+Trolley syncs issues between CSV, Github, and Buffer with Trello.
+
 """
 
 import csv
+import datetime
 import os
 import random
 
@@ -11,6 +13,9 @@ import click
 import click_config
 import github3
 
+from buffpy.api import API as BufferAPI
+from buffpy.managers.profiles import Profiles
+from buffpy.managers.updates import Updates
 from trello import TrelloClient
 
 
@@ -21,8 +26,13 @@ __version__ = '0.1.6'
 
 
 # hold auth state
+_buffer_auth = None
 _github_auth = None
 _trello_auth = None
+
+BUFFER_CLIENT_ID = os.environ.get('BUFFER_CLIENT_ID')
+BUFFER_CLIENT_SECRET = os.environ.get('BUFFER_CLIENT_SECRET')
+BUFFER_ACCESS_TOKEN = os.environ.get('BUFFER_ACCESS_TOKEN')
 
 GITHUB_USERNAME = os.environ.get('GITHUB_USERNAME')
 GITHUB_PASSWORD = os.environ.get('GITHUB_PASSWORD')
@@ -40,6 +50,11 @@ TRELLO_DEFAULT_LIST = os.environ.get('TRELLO_DEFAULT_LIST', 'Uncategorized')
 # might migrate to:
 #   http://click.pocoo.org/4/options/#values-from-environment-variables
 class config(object):
+
+    class buffer(object):
+        client_id = BUFFER_CLIENT_ID
+        client_secret = BUFFER_CLIENT_SECRET
+        access_token = BUFFER_ACCESS_TOKEN
 
     class github(object):
         username = GITHUB_USERNAME
@@ -424,6 +439,45 @@ def list_trello_cards(config, trello_board_id):
             click.echo(description)
 
 
+def get_buffer_auth(buffer_config):
+    """Log me into buffer and return an object."""
+    global _buffer_auth
+
+    if _buffer_auth:
+        return _buffer_auth
+
+    assert buffer_config.client_id
+    assert buffer_config.client_secret
+    assert buffer_config.access_token
+
+    _buffer_auth = BufferAPI(
+        client_id=buffer_config.client_id,
+        client_secret=buffer_config.client_secret,
+        access_token=buffer_config.access_token,
+    )
+
+    return _buffer_auth
+
+
+def test_buffer(config):
+    client = get_buffer_auth(config.buffer)
+
+    profiles = Profiles(api=client).filter(service='twitter')
+    if not len(profiles):
+        raise Exception('Your twitter account is not configured')
+
+    profile = profiles[0]
+    print profile
+    print
+    pending = profile.updates.pending
+    for item in pending:
+        print item
+        print item.id
+        print item.text
+        print item.scheduled_at
+        print datetime.datetime.fromtimestamp(item.scheduled_at)
+
+
 # cli methods we are exposing to be used via terminal
 
 @click.group()
@@ -431,6 +485,7 @@ def list_trello_cards(config, trello_board_id):
 @click.option('--version', is_flag=True, callback=print_version,
               expose_value=False, is_eager=True)
 def cli():
+    assert config.buffer
     pass
 
 

@@ -1,6 +1,9 @@
 click
 click-config
 github3.py
+
+git+https://github.com/bufferapp/buffer-python.git
+buffer-alpaca
 git+https://github.com/sarumont/py-trello
 
 bumpversion
