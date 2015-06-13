@@ -90,6 +90,15 @@ Commands
 ``delete_existing_github_milestones``
     Delete milestones from GitHub repo.
 
+``list_trello_boards``
+    List your Trello boards.
+
+``list_trello_cards``
+    List your Trello cards for a given board.
+
+``list_trello_organizations``
+    List your Trello organizations.
+
 ``sync_github_issues_to_trello_cards``
     Convert your GitHub issues to Trello cards.
 
