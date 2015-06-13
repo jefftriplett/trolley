@@ -379,6 +379,27 @@ def create_trello_lists(config, trello_board_id,
             click.echo('list "{}" already exists'.format(title))
 
 
+def list_trello_boards(config):
+    trello = get_trello_auth(config.trello)
+    boards = trello.list_boards()
+    for board in boards:
+        click.echo('{0}: {1}{2}'.format(
+            board.id,
+            board.name,
+            ' (closed)' if board.closed else ''
+        ))
+
+
+def list_trello_organizations(config):
+    trello = get_trello_auth(config.trello)
+    organizations = trello.list_organizations()
+    for organization in organizations:
+        click.echo('{0}: {1}'.format(
+            organization.id,
+            organization.name
+        ))
+
+
 # sync github and trello
 
 def sync_github_issues_to_trello_cards(config, github_org, github_repo,
@@ -661,14 +682,38 @@ def cli_sync_trello_cards_to_github_issues(trello_board, github_org, github_repo
         github_repo or config.github.repo)
 
 
+@cli.command('list_trello_boards')
+def cli_list_trello_boards():
+    """List your Trello boards."""
+
+    list_trello_boards(config)
+
+
 @cli.command('list_trello_cards')
 @click.option('--trello-board', type=str)
 def cli_list_trello_cards(trello_board):
-    """Convert your Trello cards to GitHub issues."""
+    """List your Trello cards for a given board."""
 
     list_trello_cards(
         config,
         trello_board or config.trello.board_id)
+
+
+@cli.command('list_trello_organizations')
+def cli_list_trello_organizations():
+    """List your Trello organizations."""
+
+    list_trello_organizations(config)
+
+
+@cli.command('test_buffer')
+def cli_test_buffer():
+    """Convert your Trello cards to GitHub issues."""
+
+    try:
+        test_buffer(config)
+    except Exception as e:
+        print e
 
 
 if __name__ == '__main__':
