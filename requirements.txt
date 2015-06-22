@@ -2,7 +2,11 @@ click
 click-config
 github3.py
 
+# we want to use
 git+https://github.com/bufferapp/buffer-python.git
+
+trollop
+# was using
 buffer-alpaca
 git+https://github.com/sarumont/py-trello
 

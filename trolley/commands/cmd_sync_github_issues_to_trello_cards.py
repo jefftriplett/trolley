@@ -27,7 +27,7 @@ from trolley.core import (
 @click.option('--github-repo', type=str)
 @click.option('--trello-board', type=str)
 @pass_context
-def cli_sync_github_issues_to_trello_cards(ctx, github_org, github_repo, trello_board):
+def cli(ctx, github_org, github_repo, trello_board):
     """Convert your GitHub issues to Trello cards."""
     sync_github_issues_to_trello_cards(
         config,

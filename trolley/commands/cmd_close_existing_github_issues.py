@@ -28,6 +28,7 @@ from trolley.core import (
 @pass_context
 def cli(ctx, force, github_org, github_repo):
     """Close all existing GitHub issues."""
+
     message = 'Do you really want to close all of your existing GitHub issues?'
     if force or click.confirm(message):
         close_existing_github_issues(

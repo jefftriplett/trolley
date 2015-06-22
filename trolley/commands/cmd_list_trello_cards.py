@@ -25,7 +25,7 @@ from trolley.core import (
 @click.command('list_trello_cards')
 @click.option('--trello-board', type=str)
 @pass_context
-def cli_list_trello_cards(ctx, trello_board):
+def cli(ctx, trello_board):
     """List your Trello cards for a given board."""
 
     list_trello_cards(

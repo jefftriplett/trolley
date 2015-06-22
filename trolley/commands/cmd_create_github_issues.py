@@ -29,6 +29,7 @@ from trolley.core import (
 @pass_context
 def cli(ctx, filename, github_org, github_repo):
     """Create GitHub issues from a CSV file."""
+
     create_github_issues(
         config,
         github_org or config.github.org,

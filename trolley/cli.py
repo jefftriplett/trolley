@@ -70,12 +70,12 @@ def print_version(ctx, param, value):
 
 @click.command(cls=ComplexCLI, context_settings=CONTEXT_SETTINGS)
 @click_config.wrap(module=config, sections=('trello', 'github', 'buffer'))
-@click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
+#@click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
 @click.option('--version', is_flag=True, callback=print_version,
               expose_value=False, is_eager=True)
-# @pass_context
+#@pass_context
 # def cli(ctx, verbose):
-def cli(verbose):
+def cli():
     # assert config.buffer
     # ctx.verbose = verbose
     pass

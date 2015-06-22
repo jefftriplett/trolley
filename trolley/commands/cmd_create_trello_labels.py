@@ -28,6 +28,7 @@ from trolley.core import (
 @pass_context
 def cli(ctx, filename, trello_board):
     """Create Trello labels from a CSV file."""
+
     create_trello_labels(
         config,
         trello_board or config.trello.board_id,

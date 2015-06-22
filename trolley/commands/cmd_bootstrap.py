@@ -27,6 +27,7 @@ from trolley.core import (
 @pass_context
 def cli(ctx, github_org, github_repo):
     """Sets up github with some sensible defaults."""
+
     delete_existing_github_labels(
         config,
         github_org or config.github.org,

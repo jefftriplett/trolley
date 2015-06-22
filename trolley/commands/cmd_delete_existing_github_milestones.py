@@ -29,6 +29,7 @@ from trolley.core import (
 @pass_context
 def cli(ctx, force, github_org, github_repo):
     """Delete milestones from GitHub repo."""
+
     message = 'Do you really want to delete all of the existing GitHub milestones?'
     if force or click.confirm(message):
         delete_existing_github_milestones(

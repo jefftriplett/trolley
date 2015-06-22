@@ -25,7 +25,8 @@ from trolley.core import (
 @click.command('test_buffer')
 @pass_context
 def cli(ctx):
-    """Convert your Trello cards to GitHub issues."""
+    """Test Buffer."""
+
     try:
         test_buffer(config)
     except Exception as e:
