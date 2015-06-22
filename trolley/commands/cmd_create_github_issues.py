@@ -1,6 +1,5 @@
 import click
 
-
 from trolley.cli import pass_context
 from trolley.config import config
 from trolley.core import (

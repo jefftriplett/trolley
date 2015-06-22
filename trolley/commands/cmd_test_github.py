@@ -1,6 +1,5 @@
 import click
 
-
 from trolley.cli import pass_context
 from trolley.config import config
 from trolley.core import (
@@ -28,6 +27,6 @@ def cli(ctx):
     """Test GitHub."""
 
     try:
-        test_buffer(config)
+        ctx.log('test github')
     except Exception as e:
         print e
