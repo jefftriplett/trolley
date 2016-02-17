@@ -109,19 +109,21 @@ Commands
 Object Overview
 ---------------
 
-+--------------+----------+---------+
-| Github       | Trello   | Notes   |
-+==============+==========+=========+
-| Org / Repo   | Board    | ==      |
-+--------------+----------+---------+
-|              | Lists    |         |
-+--------------+----------+---------+
-| Issues       | Cards    | ==      |
-+--------------+----------+---------+
-| Labels       | Labels   | ==      |
-+--------------+----------+---------+
-| Milestones   |          |         |
-+--------------+----------+---------+
++---------------+---------------+---------+
+| Github        | Trello        | Notes   |
++===============+===============+=========+
+| Organization  | Organization  | ==      |
++---------------+---------------+---------+
+| Repository    | Board         | ==      |
++---------------+---------------+---------+
+|               | Lists         |         |
++---------------+---------------+---------+
+| Issues        | Cards         | ==      |
++---------------+---------------+---------+
+| Labels        | Labels        | ==      |
++---------------+---------------+---------+
+| Milestones    |               |         |
++---------------+---------------+---------+
 
 Milestones and Lists may be mapped together but they are fundamentally
 treated very differently.
@@ -138,4 +140,3 @@ Inspiration
 This project shares ideas from the following projects:
 
 -  The CSV bits via: https://github.com/nprapps/app-template
-
