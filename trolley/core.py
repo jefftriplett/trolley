@@ -4,13 +4,11 @@ Trolley syncs issues between CSV, Github, and Buffer with Trello.
 
 """
 
+import click
 import csv
 import datetime
-import random
-
-import click
 import github3
-
+import random
 
 # from buffpy.managers.updates import Updates
 from buffpy.api import API as BufferAPI
@@ -216,8 +214,8 @@ def get_trello_auth(settings):
 
 def get_existing_trello_boards(settings, trello_board_id):
     trello = get_trello_auth(settings)
-    board = trello.get_board(trello_board_id)
-    boards = [str(board.name) for board in board.get_cards()]
+    boards = trello.get_board(trello_board_id)
+    boards = [str(board.name) for board in boards.get_cards()]
     return boards
 
 
@@ -319,7 +317,7 @@ def create_trello_labels(settings, trello_board_id,
             if not len(color):
                 color = get_random_color()
             # TODO: Create Trello label via API
-            #repository.create_label(name, color)
+            # repository.create_label(name, color)
         else:
             click.echo('label "{}" already exists'.format(name))
 
