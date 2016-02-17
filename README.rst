@@ -25,37 +25,38 @@ Installation
 Usage
 -----
 
-Example trolley.yml
-~~~~~~~~~~~~~~~~~~~
+Example trolley_settings.py
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code-block:: yaml
+.. code-block:: bash
 
-    buffer:
-        client_id: 'buffer client_id'
-        client_secret: 'buffer client_secret'
-        access_token: 'buffer access_token'
+    export TROLLEY_SETTINGS_MODULE='trolley_settings'
 
-    github:
-        username: 'username'
-        password: 'password'
-        org: 'github'
-        repo: 'gitignore'
+.. code-block:: python
 
-    trello:
-        app_key: 'get-this-from-trello'
-        app_secret: 'get-this-from-trello'
-        auth_token: 'get-this-from-trello'
-        board_id: 'your-board-id-sha'
-        default_list: 'Uncategorized'
+    BUFFER_ACCESS_TOKEN = ''
+    BUFFER_CLIENT_ID = ''
+    BUFFER_CLIENT_SECRET = ''
+
+    GITHUB_USERNAME = ''
+    GITHUB_PASSWORD = ''
+    GITHUB_ORG = ''
+    GITHUB_REPO = ''
+
+    TRELLO_APP_KEY = ''
+    TRELLO_APP_SECRET = ''
+    TRELLO_AUTH_TOKEN = ''
+    TRELLO_BOARD_ID = ''
+    TRELLO_DEFAULT_LIST = ''
 
 Usage
 ~~~~~
 
 .. code-block:: bash
 
-    $ trolley --conf trolley.yml --help
+    $ trolley --help
 
-    $ trolley --conf trolley.yml create_github_issues
+    $ trolley create_github_issues
 
 Commands
 ~~~~~~~~
