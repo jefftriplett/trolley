@@ -2,7 +2,6 @@ import click
 
 from trolley import core
 from trolley.cli import pass_context
-from trolley.config import config
 
 
 @click.command('bootstrap')

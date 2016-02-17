@@ -1,4 +1,5 @@
-from setuptools import setup, find_packages
+from setuptools import setup
+
 
 setup(
     name='trolley',
@@ -7,9 +8,13 @@ setup(
     author='Jeff Triplett',
     author_email='jeff.triplett@gmail.com',
     url='http://github.com/jefftriplett/trolley',
-    # packages=find_packages(),
-    packages=['trolley', ],
-    py_modules=['trolley'],
+    packages=[
+        'trolley',
+        'trolley.commands',
+    ],
+    py_modules=[
+        'trolley',
+    ],
     entry_points={
         'console_scripts': [
             'trolley=trolley.cli:cli',
@@ -17,8 +22,7 @@ setup(
     },
     install_requires=[
         'click',
-        'click-config',
         'github3.py',
-        #'git+ssh://git@github.com/sarumont/py-trello.git@0.2.3',
+        # 'git+ssh://git@github.com/sarumont/py-trello.git@0.2.3',
     ],
 )

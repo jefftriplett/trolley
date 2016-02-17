@@ -5,7 +5,6 @@ Trolley syncs issues between CSV, Github, and Buffer with Trello.
 """
 
 import click
-# import click_config
 import os
 import sys
 
@@ -50,6 +49,18 @@ cmd_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), 'commands')
 
 class ComplexCLI(click.MultiCommand):
 
+    def get_command(self, context, name):
+        try:
+            if sys.version_info[0] == 2:
+                name = name.encode('ascii', 'replace')
+
+            mod = __import__('trolley.commands.cmd_{0}'.format(name),
+                             None, None, ['cli'])
+
+        except ImportError:
+            return
+        return mod.cli
+
     def list_commands(self, context):
         rv = []
         for filename in os.listdir(cmd_folder):
@@ -58,18 +69,6 @@ class ComplexCLI(click.MultiCommand):
                 rv.append(filename[4:-3])
         rv.sort()
         return rv
-
-    def get_command(self, context, name):
-        try:
-            if sys.version_info[0] == 2:
-                name = name.encode('ascii', 'replace')
-            mod = __import__('trolley.commands.cmd_' + name,
-                             None, None, ['cli'])
-            # if hasattr(mod, 'enabled'):
-            #     print name, mod.enabled()
-        except ImportError:
-            return
-        return mod.cli
 
 
 def print_version(context, param, value):

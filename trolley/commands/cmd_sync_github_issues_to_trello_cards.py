@@ -16,4 +16,5 @@ def cli(context, github_org, github_repo, trello_board):
         context.settings,
         github_org or context.settings.GITHUB_ORG,
         github_repo or context.settings.GITHUB_REPO,
-        trello_board or context.settings.TRELLO_BOARD_ID)
+        trello_board or context.settings.TRELLO_BOARD_ID,
+    )
