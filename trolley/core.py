@@ -340,9 +340,6 @@ def create_trello_lists(settings, trello_board_id,
 
 
 def list_trello_boards(settings):
-
-    print settings.keys()
-
     trello = get_trello_auth(settings)
     boards = trello.list_boards()
     for board in boards:
