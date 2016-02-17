@@ -5,11 +5,21 @@ Trolley syncs issues between CSV, Github, and Buffer with Trello.
 """
 
 import click
-import click_config
+# import click_config
 import os
 import sys
 
-from trolley.config import config
+from dynaconf import LazySettings
+
+
+DYNACONF_NAMESPACE = 'TROLLEY'
+
+settings = LazySettings(
+    DYNACONF_NAMESPACE=DYNACONF_NAMESPACE,
+    ENVVAR_FOR_DYNACONF='TROLLEY_SETTINGS_MODULE',
+)
+
+settings.configure()
 
 
 CONTEXT_SETTINGS = dict(auto_envvar_prefix='TROLLEY')
@@ -18,8 +28,9 @@ CONTEXT_SETTINGS = dict(auto_envvar_prefix='TROLLEY')
 class Context(object):
 
     def __init__(self):
-        self.verbose = False
         self.home = os.getcwd()
+        self.settings = settings
+        self.verbose = False
 
     def log(self, msg, *args):
         """Logs a message to stderr."""
@@ -39,7 +50,7 @@ cmd_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), 'commands')
 
 class ComplexCLI(click.MultiCommand):
 
-    def list_commands(self, ctx):
+    def list_commands(self, context):
         rv = []
         for filename in os.listdir(cmd_folder):
             if filename.endswith('.py') and \
@@ -48,34 +59,31 @@ class ComplexCLI(click.MultiCommand):
         rv.sort()
         return rv
 
-    def get_command(self, ctx, name):
+    def get_command(self, context, name):
         try:
             if sys.version_info[0] == 2:
                 name = name.encode('ascii', 'replace')
             mod = __import__('trolley.commands.cmd_' + name,
                              None, None, ['cli'])
+            # if hasattr(mod, 'enabled'):
+            #     print name, mod.enabled()
         except ImportError:
             return
         return mod.cli
 
 
-def print_version(ctx, param, value):
+def print_version(context, param, value):
     from trolley import __version__
 
-    if not value or ctx.resilient_parsing:
+    if not value or context.resilient_parsing:
         return
     click.echo('version {}'.format(__version__))
-    ctx.exit()
+    context.exit()
 
 
 @click.command(cls=ComplexCLI, context_settings=CONTEXT_SETTINGS)
-@click_config.wrap(module=config, sections=('trello', 'github', 'buffer'))
-#@click.option('-v', '--verbose', is_flag=True, help='Enables verbose mode.')
 @click.option('--version', is_flag=True, callback=print_version,
               expose_value=False, is_eager=True)
-#@pass_context
-# def cli(ctx, verbose):
 def cli():
-    # assert config.buffer
-    # ctx.verbose = verbose
+    # context.verbose = verbose
     pass

@@ -12,16 +12,14 @@ import click
 import github3
 
 
+# from buffpy.managers.updates import Updates
 from buffpy.api import API as BufferAPI
 from buffpy.managers.profiles import Profiles
-from buffpy.managers.updates import Updates
 from trello import TrelloClient
-
-from trolley.config import config
 
 
 __author__ = 'Jeff Triplett'
-__copyright__ = 'Copyright 2015, Jeff Triplett'
+__copyright__ = 'Copyright 2016, Jeff Triplett'
 __license__ = 'BSD'
 __version__ = '0.1.6'
 
@@ -48,79 +46,79 @@ def get_random_color():
     return colors[index]['color']
 
 
-def print_version(ctx, param, value):
-    if not value or ctx.resilient_parsing:
+def print_version(context, param, value):
+    if not value or context.resilient_parsing:
         return
     click.echo('version {}'.format(__version__))
-    ctx.exit()
+    context.exit()
 
 
 # github utils
 
-def get_github_auth(github_config):
+def get_github_auth(settings):
     """Log me into github and return an object."""
     global _github_auth
 
     if _github_auth:
         return _github_auth
 
-    assert github_config.username
-    assert github_config.password
+    assert settings.GITHUB_USERNAME
+    assert settings.GITHUB_PASSWORD
 
     _github_auth = github3.login(
-        github_config.username,
-        github_config.password)
+        settings.GITHUB_USERNAME,
+        settings.GITHUB_PASSWORD)
 
     return _github_auth
 
 
-def get_github_repository(config, github_org, github_repo):
+def get_github_repository(settings, github_org, github_repo):
     """Return a repository object and log me in."""
-    github = get_github_auth(config.github)
+    github = get_github_auth(settings)
     repository = github.repository(github_org, github_repo)
     return repository
 
 
-def get_existing_github_issues(config, github_org, github_repo):
-    repository = get_github_repository(config, github_org, github_repo)
-    existing_issues = [str(item.title) for item in repository.iter_issues()]
+def get_existing_github_issues(settings, github_org, github_repo):
+    repository = get_github_repository(settings, github_org, github_repo)
+    existing_issues = [item.title for item in repository.iter_issues()]
     return existing_issues
 
 
-def get_existing_github_labels(config, github_org, github_repo):
-    repository = get_github_repository(config, github_org, github_repo)
-    existing_labels = [str(item.name) for item in repository.iter_labels()]
+def get_existing_github_labels(settings, github_org, github_repo):
+    repository = get_github_repository(settings, github_org, github_repo)
+    existing_labels = [item.name for item in repository.iter_labels()]
     return existing_labels
 
 
-def get_existing_github_milestones(config, github_org, github_repo):
-    repository = get_github_repository(config, github_org, github_repo)
-    existing_milestones = [str(item.title) for item in repository.iter_milestones()]
+def get_existing_github_milestones(settings, github_org, github_repo):
+    repository = get_github_repository(settings, github_org, github_repo)
+    existing_milestones = [item.title for item in repository.iter_milestones()]
     return existing_milestones
 
 
 # github core
 
-def close_existing_github_issues(config, github_org, github_repo):
-    repository = get_github_repository(config, github_org, github_repo)
-    issues = [str(issue.title) for issue in repository.iter_issues()]
+def close_existing_github_issues(settings, github_org, github_repo):
+    repository = get_github_repository(settings, github_org, github_repo)
+    issues = [issue.title for issue in repository.iter_issues()]
 
     click.echo('closing {} issues'.format(len(issues)))
     for issue in repository.iter_issues():
-        click.echo('closing issue "{}"'.format(issue.title))
+        click.echo(u'closing issue "{}"'.format(issue.title))
         issue.close()
 
 
-def create_github_issues(config, github_org, github_repo,
+def create_github_issues(settings, github_org, github_repo,
                          filename='etc/default_github_issues.csv'):
     issues = csv_to_dict_list(filename)
-    repository = get_github_repository(config, github_org, github_repo)
-    existing_issues = get_existing_github_issues(config, github_org, github_repo)
+    repository = get_github_repository(settings, github_org, github_repo)
+    existing_issues = get_existing_github_issues(settings, github_org, github_repo)
 
     click.echo('creating {} issues'.format(len(issues)))
     for issue in issues:
-        title = str(issue['title'])
-        body = str(issue['body'])
+        title = issue['title']
+        body = issue['body']
         labels = issue['labels']
 
         if labels:
@@ -128,19 +126,21 @@ def create_github_issues(config, github_org, github_repo,
                 labels = labels.split(',')
             else:
                 labels = [labels]
+        else:
+            labels = []
 
         if title not in existing_issues:
-            click.echo('creating issue "{}"'.format(title))
+            click.echo(u'creating issue "{}"'.format(title))
             repository.create_issue(title, body, labels=labels)
         else:
-            click.echo('issue "{}" already exists'.format(title))
+            click.echo(u'issue "{}" already exists'.format(title))
 
 
-def create_github_labels(config, github_org, github_repo,
+def create_github_labels(settings, github_org, github_repo,
                          filename='etc/default_github_labels.csv'):
     labels = csv_to_dict_list(filename)
-    repository = get_github_repository(config, github_org, github_repo)
-    existing_labels = get_existing_github_labels(config, github_org, github_repo)
+    repository = get_github_repository(settings, github_org, github_repo)
+    existing_labels = get_existing_github_labels(settings, github_org, github_repo)
 
     click.echo('creating {} labels'.format(len(labels)))
     for label in labels:
@@ -155,11 +155,11 @@ def create_github_labels(config, github_org, github_repo,
             click.echo('label "{}" already exists'.format(name))
 
 
-def create_github_milestones(config, github_org, github_repo,
+def create_github_milestones(settings, github_org, github_repo,
                              filename='etc/default_github_milestones.csv'):
     milestones = csv_to_dict_list(filename)
-    repository = get_github_repository(config, github_org, github_repo)
-    existing_milestones = get_existing_github_milestones(config, github_org, github_repo)
+    repository = get_github_repository(settings, github_org, github_repo)
+    existing_milestones = get_existing_github_milestones(settings, github_org, github_repo)
 
     click.echo('creating {} milestones'.format(len(milestones)))
     for milestone in milestones:
@@ -171,8 +171,8 @@ def create_github_milestones(config, github_org, github_repo,
             click.echo('milestone "{}" already exists'.format(title))
 
 
-def delete_existing_github_labels(config, github_org, github_repo):
-    repository = get_github_repository(config, github_org, github_repo)
+def delete_existing_github_labels(settings, github_org, github_repo):
+    repository = get_github_repository(settings, github_org, github_repo)
 
     labels = [str(label.name) for label in repository.iter_labels()]
 
@@ -182,8 +182,8 @@ def delete_existing_github_labels(config, github_org, github_repo):
         repository.label(label).delete()
 
 
-def delete_existing_github_milestones(config, github_org, github_repo):
-    repository = get_github_repository(config, github_org, github_repo)
+def delete_existing_github_milestones(settings, github_org, github_repo):
+    repository = get_github_repository(settings, github_org, github_repo)
     milestones = repository.iter_milestones(github_org, github_repo)
 
     click.echo('removing {} milestones'.format(len(list(milestones))))
@@ -194,59 +194,59 @@ def delete_existing_github_milestones(config, github_org, github_repo):
 
 # trello utils
 
-def get_trello_auth(trello_config):
+def get_trello_auth(settings):
     """Log me into trello and return an object."""
     global _trello_auth
 
     if _trello_auth:
         return _trello_auth
 
-    assert trello_config.app_key
-    assert trello_config.app_secret
-    assert trello_config.auth_token
+    assert settings.TRELLO_APP_KEY
+    assert settings.TRELLO_APP_SECRET
+    assert settings.TRELLO_AUTH_TOKEN
 
     _trello_auth = TrelloClient(
-        api_key=trello_config.app_key,
-        api_secret=trello_config.app_secret,
-        token=trello_config.auth_token,
+        api_key=settings.TRELLO_APP_KEY,
+        api_secret=settings.TRELLO_APP_SECRET,
+        token=settings.TRELLO_AUTH_TOKEN,
         # token_secret=str(trello_config.auth_token),
     )
     return _trello_auth
 
 
-def get_existing_trello_boards(config, trello_board_id):
-    trello = get_trello_auth(config.trello)
+def get_existing_trello_boards(settings, trello_board_id):
+    trello = get_trello_auth(settings)
     board = trello.get_board(trello_board_id)
     boards = [str(board.name) for board in board.get_cards()]
     return boards
 
 
-def get_existing_trello_cards(config, trello_board_id):
-    trello = get_trello_auth(config.trello)
+def get_existing_trello_cards(settings, trello_board_id):
+    trello = get_trello_auth(settings)
     board = trello.get_board(trello_board_id)
     cards = board.get_cards()
     cards = [str(card.name) for card in cards]
     return cards
 
 
-def get_existing_trello_labels(config, trello_board_id):
-    trello = get_trello_auth(config.trello)
+def get_existing_trello_labels(settings, trello_board_id):
+    trello = get_trello_auth(settings)
     board = trello.get_board(trello_board_id)
     labels = board.get_labels()
     labels = [label for label in labels]
     return labels
 
 
-def get_existing_trello_lists(config, trello_board_id):
-    trello = get_trello_auth(config.trello)
+def get_existing_trello_lists(settings, trello_board_id):
+    trello = get_trello_auth(settings)
     board = trello.get_board(trello_board_id)
     all_lists = board.all_lists()
     all_lists = [item.name for item in all_lists]
     return all_lists
 
 
-def get_trello_list_lookup(config, trello_board_id):
-    trello = get_trello_auth(config.trello)
+def get_trello_list_lookup(settings, trello_board_id):
+    trello = get_trello_auth(settings)
     board = trello.get_board(trello_board_id)
     all_lists = board.all_lists()
     list_lookup = {}
@@ -256,7 +256,7 @@ def get_trello_list_lookup(config, trello_board_id):
         list_lookup[name] = id
         list_lookup[id] = name
 
-    default_list = config.trello.default_list
+    default_list = settings.TRELLO_DEFAULT_LIST
     if default_list not in list_lookup:
         new_list = board.add_list(default_list)
         new_list_id = new_list.id
@@ -268,13 +268,13 @@ def get_trello_list_lookup(config, trello_board_id):
 
 # trello core
 
-def create_trello_cards(config, trello_board_id,
+def create_trello_cards(settings, trello_board_id,
                         filename='etc/default_trello_cards.csv'):
     cards = csv_to_dict_list(filename)
-    trello = get_trello_auth(config.trello)
-    existing_cards = get_existing_trello_cards(config, trello_board_id)
-    board_lookup = get_trello_list_lookup(config, trello_board_id)
-    category = board_lookup[config.trello.default_list]
+    trello = get_trello_auth(settings)
+    existing_cards = get_existing_trello_cards(settings, trello_board_id)
+    board_lookup = get_trello_list_lookup(settings, trello_board_id)
+    category = board_lookup[settings.TRELLO_DEFAULT_LIST]
     board = trello.get_board(trello_board_id)
 
     click.echo('creating {} cards'.format(len(cards)))
@@ -305,10 +305,10 @@ def create_trello_cards(config, trello_board_id,
             click.echo('issue "{}" already exists'.format(name))
 
 
-def create_trello_labels(config, trello_board_id,
+def create_trello_labels(settings, trello_board_id,
                          filename='etc/default_trello_labels.csv'):
     labels = csv_to_dict_list(filename)
-    existing_labels = get_existing_trello_labels(config, trello_board_id)
+    existing_labels = get_existing_trello_labels(settings, trello_board_id)
 
     click.echo('creating {} labels'.format(len(labels)))
     for label in labels:
@@ -324,11 +324,11 @@ def create_trello_labels(config, trello_board_id,
             click.echo('label "{}" already exists'.format(name))
 
 
-def create_trello_lists(config, trello_board_id,
+def create_trello_lists(settings, trello_board_id,
                         filename='etc/default_trello_lists.csv'):
     lists = csv_to_dict_list(filename)
-    trello = get_trello_auth(config.trello)
-    existing_lists = get_existing_trello_lists(config, trello_board_id)
+    trello = get_trello_auth(settings)
+    existing_lists = get_existing_trello_lists(settings, trello_board_id)
 
     click.echo('creating {} lists'.format(len(lists)))
 
@@ -341,8 +341,11 @@ def create_trello_lists(config, trello_board_id,
             click.echo('list "{}" already exists'.format(title))
 
 
-def list_trello_boards(config):
-    trello = get_trello_auth(config.trello)
+def list_trello_boards(settings):
+
+    print settings.keys()
+
+    trello = get_trello_auth(settings)
     boards = trello.list_boards()
     for board in boards:
         click.echo('{0}: {1}{2}'.format(
@@ -352,8 +355,8 @@ def list_trello_boards(config):
         ))
 
 
-def list_trello_organizations(config):
-    trello = get_trello_auth(config.trello)
+def list_trello_organizations(settings):
+    trello = get_trello_auth(settings)
     organizations = trello.list_organizations()
     for organization in organizations:
         click.echo('{0}: {1}'.format(
@@ -364,20 +367,20 @@ def list_trello_organizations(config):
 
 # sync github and trello
 
-def sync_github_issues_to_trello_cards(config, github_org, github_repo,
+def sync_github_issues_to_trello_cards(settings, github_org, github_repo,
                                        trello_board_id):
-    trello = get_trello_auth(config.trello)
-    board_lookup = get_trello_list_lookup(config, trello_board_id)
-    existing_trello_cards = get_existing_trello_cards(config, trello_board_id)
-    repository = get_github_repository(config, github_org, github_repo)
+    trello = get_trello_auth(settings)
+    board_lookup = get_trello_list_lookup(settings, trello_board_id)
+    existing_trello_cards = get_existing_trello_cards(settings, trello_board_id)
+    repository = get_github_repository(settings, github_org, github_repo)
     issues = repository.iter_issues()
 
-    #click.echo('creating {} issues'.format(issues.count))
+    # click.echo('creating {} issues'.format(issues.count))
 
     for issue in issues:
         title = issue.title
         desc = issue.body
-        category = board_lookup[config.trello.default_list]
+        category = board_lookup[settings.TRELLO_DEFAULT_LIST]
         if title not in existing_trello_cards:
             click.echo('creating issue "{}"'.format(title))
             trello.cards.new(title, category, desc=desc)
@@ -385,10 +388,10 @@ def sync_github_issues_to_trello_cards(config, github_org, github_repo,
             click.echo('issue "{}" already exists'.format(title))
 
 
-def sync_trello_cards_to_github_issues(config, trello_board_id, github_org, github_repo):
-    trello = get_trello_auth(config.trello)
-    existing_github_issues = get_existing_github_issues(config, github_org, github_repo)
-    repository = get_github_repository(config, github_org, github_repo)
+def sync_trello_cards_to_github_issues(settings, trello_board_id, github_org, github_repo):
+    trello = get_trello_auth(settings)
+    existing_github_issues = get_existing_github_issues(settings, github_org, github_repo)
+    repository = get_github_repository(settings, github_org, github_repo)
     board = trello.get_board(trello_board_id)
     cards = board.all_cards()
 
@@ -408,9 +411,11 @@ def sync_trello_cards_to_github_issues(config, trello_board_id, github_org, gith
             click.echo('card "{}" already exists'.format(name))
 
 
-def list_trello_cards(config, trello_board_id):
-    trello = get_trello_auth(config.trello)
-    board = trello.get_board(config.trello.board_id)
+def list_trello_cards(settings, trello_board_id):
+    assert settings.TRELLO_BOARD_ID
+
+    trello = get_trello_auth(settings)
+    board = trello.get_board(settings.TRELLO_BOARD_ID)
     cards = [card for card in board.open_cards()]
 
     for card in cards:
@@ -422,28 +427,28 @@ def list_trello_cards(config, trello_board_id):
             click.echo(description)
 
 
-def get_buffer_auth(buffer_config):
+def get_buffer_auth(settings):
     """Log me into buffer and return an object."""
     global _buffer_auth
 
     if _buffer_auth:
         return _buffer_auth
 
-    assert buffer_config.client_id
-    assert buffer_config.client_secret
-    assert buffer_config.access_token
+    assert settings.BUFFER_CLIENT_ID
+    assert settings.BUFFER_CLIENT_SECRET
+    assert settings.BUFFER_ACCESS_TOKEN
 
     _buffer_auth = BufferAPI(
-        client_id=buffer_config.client_id,
-        client_secret=buffer_config.client_secret,
-        access_token=buffer_config.access_token,
+        client_id=settings.BUFFER_CLIENT_ID,
+        client_secret=settings.BUFFER_CLIENT_SECRET,
+        access_token=settings.BUFFER_ACCESS_TOKEN,
     )
 
     return _buffer_auth
 
 
-def test_buffer(config):
-    client = get_buffer_auth(config.buffer)
+def test_buffer(settings):
+    client = get_buffer_auth(settings)
 
     profiles = Profiles(api=client).filter(service='twitter')
     if not len(profiles):
