@@ -23,6 +23,7 @@ setup(
     install_requires=[
         'click',
         'github3.py',
+        'dynaconf',
         # 'git+ssh://git@github.com/sarumont/py-trello.git@0.2.3',
     ],
 )
