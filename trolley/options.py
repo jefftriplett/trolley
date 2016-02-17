@@ -21,3 +21,8 @@ trello_board_options = click.option(
     '--trello-board',
     type=str,
 )
+
+trello_org_options = click.option(
+    '--trello-org',
+    type=str,
+)
