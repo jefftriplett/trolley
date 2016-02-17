@@ -1,13 +1,13 @@
 import click
 
-from trolley import core
+from trolley import core, options
 from trolley.cli import pass_context
 
 
 @click.command('close_existing_github_issues')
-@click.option('--force/--no-force', default=False)
-@click.option('--github-org', type=str)
-@click.option('--github-repo', type=str)
+@options.force_options
+@options.github_org_options
+@options.github_repo_options
 @pass_context
 def cli(context, force, github_org, github_repo):
     """Close all existing GitHub issues."""

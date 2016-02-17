@@ -1,12 +1,12 @@
 import click
 
-from trolley import core
+from trolley import core, options
 from trolley.cli import pass_context
 
 
 @click.command('bootstrap')
-@click.option('--github-org', type=str)
-@click.option('--github-repo', type=str)
+@options.github_org_options
+@options.github_repo_options
 @pass_context
 def cli(context, github_org, github_repo):
     """Sets up github with some sensible defaults."""
